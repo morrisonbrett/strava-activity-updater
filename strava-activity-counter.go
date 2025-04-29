@@ -55,31 +55,41 @@ func main() {
 		log.Fatalf("Failed to get activities: %v", err)
 	}
 
-	// Count activities by name
+	// Count activities by name and sport type
 	activityCounts := make(map[string]int)
+	sportTypeCounts := make(map[string]int)
 	for _, activity := range activities {
 		activityCounts[activity.Name]++
+		sportTypeCounts[activity.SportType]++
 	}
 
-	// Convert to slice for sorting
-	type ActivityCount struct {
+	// Convert to slices for sorting
+	type Count struct {
 		Name  string
 		Count int
 	}
-	var counts []ActivityCount
+	var nameCounts []Count
+	var sportTypeCountsList []Count
+
 	for name, count := range activityCounts {
-		counts = append(counts, ActivityCount{name, count})
+		nameCounts = append(nameCounts, Count{name, count})
+	}
+	for sportType, count := range sportTypeCounts {
+		sportTypeCountsList = append(sportTypeCountsList, Count{sportType, count})
 	}
 
 	// Sort by count (descending)
-	sort.Slice(counts, func(i, j int) bool {
-		return counts[i].Count > counts[j].Count
+	sort.Slice(nameCounts, func(i, j int) bool {
+		return nameCounts[i].Count > nameCounts[j].Count
+	})
+	sort.Slice(sportTypeCountsList, func(i, j int) bool {
+		return sportTypeCountsList[i].Count > sportTypeCountsList[j].Count
 	})
 
-	// Print results
+	// Print name counts
 	fmt.Printf("\nActivity Name Counts:\n")
 	fmt.Printf("--------------------\n")
-	for _, count := range counts {
+	for _, count := range nameCounts {
 		// Visualize spaces in the name
 		visualizedName := strings.ReplaceAll(count.Name, " ", "·")
 		if strings.HasPrefix(count.Name, " ") {
@@ -91,5 +101,14 @@ func main() {
 		fmt.Printf("%-40s %d\n", visualizedName, count.Count)
 	}
 	fmt.Printf("--------------------\n")
-	fmt.Printf("Total unique activities: %d\n", len(counts))
+	fmt.Printf("Total unique activities: %d\n", len(nameCounts))
+
+	// Print sport type counts
+	fmt.Printf("\nSport Type Counts:\n")
+	fmt.Printf("--------------------\n")
+	for _, count := range sportTypeCountsList {
+		fmt.Printf("%-40s %d\n", count.Name, count.Count)
+	}
+	fmt.Printf("--------------------\n")
+	fmt.Printf("Total unique sport types: %d\n", len(sportTypeCountsList))
 }
