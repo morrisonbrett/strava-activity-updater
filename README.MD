@@ -1,6 +1,96 @@
-# 🏒 Strava Activity Updater
+# 🏒 Strava Activity Tools
 
-A Golang CLI tool that automatically updates your Strava activities to match your preferences.
+A collection of tools for managing and analyzing Strava activities.
+
+## Tools
+
+### 1. Activity Counter (`strava-activity-counter.go`)
+
+Counts and displays all your activity names, showing:
+- Total count for each unique activity name
+- Visual indicators for leading/trailing spaces (→ for leading, ← for trailing, · for internal spaces)
+- Sorted by frequency (most common first)
+
+```bash
+go run strava-activity-counter.go
+```
+
+Example output:
+```
+Activity Name Counts:
+--------------------
+Pickup·Ice·Hockey                             300
+→Pickup·Ice·Hockey                            150
+Pickup·Ice·Hockey←                            100
+--------------------
+Total unique activities: 3
+```
+
+### 2. Activity Renamer (`strava-activity-renamer.go`)
+
+Renames activities based on predefined mappings. Currently configured to:
+- Fix capitalization: "Pickup ice Hockey" → "Pickup Ice Hockey"
+- Standardize training names: "Private Training Workout" → "Private Training Session"
+- Standardize workout names: "Workout w/Trainer" → "Private Training Session"
+- Fix typos: "Gym Workou" → "Gym Workout"
+- Standardize workout names: "Workout" → "Gym Workout"
+
+```bash
+# Show what would be changed (dry run)
+go run strava-activity-renamer.go
+
+# Apply the changes
+go run strava-activity-renamer.go -dry-run=false
+```
+
+### 3. Activity Updater (`strava-activity-updater.go`)
+
+Updates the most recent activity if it matches certain criteria. Currently configured to:
+- Change "Morning Workout" to "Pickup Ice Hockey"
+- Change sport type from "Workout" to "IceSkate"
+
+```bash
+# Run with verbose logging
+go run strava-activity-updater.go -verbose
+```
+
+## Configuration
+
+All tools use the same configuration file (`strava_config.json`). You can specify a different config file using the `-config` flag:
+
+```bash
+go run strava-activity-counter.go -config=my_config.json
+```
+
+The config file should contain:
+```json
+{
+  "client_id": "your_client_id",
+  "client_secret": "your_client_secret",
+  "refresh_token": "your_refresh_token"
+}
+```
+
+You can also provide the refresh token directly via command line:
+```bash
+go run strava-activity-counter.go -api-key=your_refresh_token
+```
+
+## Common Flags
+
+All tools support these common flags:
+- `-api-key`: Strava API key (refresh token)
+- `-config`: Path to config file (default: "strava_config.json")
+- `-verbose`: Enable verbose logging (where applicable)
+- `-dry-run`: Show what would be changed without making changes (where applicable)
+
+## Development
+
+The code is organized into packages:
+- `auth`: Authentication and token management
+- `strava`: Common types and API functions
+
+Each tool is a separate program that can be run independently.
 
 ## 🎯 Purpose
 
